@@ -1,0 +1,79 @@
+<html>
+
+<head>
+    <title>List Manga</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        .title {
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif !important;
+        }
+    </style>
+</head>
+
+<body class="bg-dark p-2">
+
+    <script src="//unpkg.com/alpinejs"></script>
+    <script>
+        Alpine.data('data', () => ({
+            init() {
+                fetch("/api/list").then(data => data.json()).then(data => this.mangas = data)
+            },
+            shown(manga) {
+                let sameName = manga.name.toLowerCase().includes(this.search.toLowerCase())
+                let onState = false;
+
+                if (this.state == 'a') onState = true;
+                else if (this.state == 'r') onState = manga.lastRead == manga.index;
+                else if (this.state == 'u') onState = manga.lastRead < manga.index;
+
+                return sameName && onState;
+            },
+            mangas: [],
+            search: "",
+            state: "a"
+        }))
+    </script>
+
+    <div class="row p-3" x-data="data">
+        <div class="col-9 mb-3">
+            <input type="text" class="w-100 form-control" placeholder="search" x-model="search">
+        </div>
+        <div class="col-3 mb-3">
+            <select class="form-select w-100" aria-label="Default select example" x-model="state">
+                <option selected value="a">All</option>
+                <option value="r">Readed</option>
+                <option value="u">UnReaded</option>
+            </select>
+        </div>
+        <template x-for="manga in mangas">
+            <template x-if="shown(manga)">
+                <div class="col-2 p-2">
+                    <div class="card">
+                        <div class="card-body">
+                            <img x-bind:src="manga.image" style="width: 100%; height: 215px; object-fit: cover;"
+                                referrerpolicy="no-referrer">
+                            <h5 class="card-subtitle my-2 text-muted title" x-text="manga.name">
+                                </h4>
+                                <a x-bind:href="`/read?id=${manga.id}&page=${manga.lastRead}`"
+                                    x-bind:class="manga.index == manga.lastRead ? 'btn-success' : 'btn-primary'"
+                                    class="btn w-100" x-text="`READ ${manga.lastRead} / ${manga.index}`"></a>
+                        </div>
+                    </div>
+                </div>
+            </template>
+        </template>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+        crossorigin="anonymous"></script>
+</body>
+
+</html>

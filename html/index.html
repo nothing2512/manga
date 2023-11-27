@@ -1,0 +1,73 @@
+<html>
+
+<head>
+    <title>Manga Ku</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+</head>
+
+<body class="bg-dark">
+    <div class="row justify-content-center p-3">
+        <a href="/list" class="btn btn-light col-6 m-3 p-3">Lihat</a>
+        <button id="updateBtn" class="btn btn-light col-6 m-3 p-3" onclick="updateManga()">Update</button>
+        <div class="col-6 m-3 p-0">
+            <input type="text" name="uri" class="form-control my-2" placeholder="url" id="addUrl">
+            <button class="btn btn-light col-12" id="btnAdd" onclick="addManga()">Add</a>
+        </div>
+        <div id="eventLog"
+            style="height: 300px; overflow-y: scroll; background: #111111; color: #fefefe; padding: 8px; margin: 8px;">
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+        crossorigin="anonymous"></script>
+    <script>
+        const eventLog = document.getElementById("eventLog");
+        const addBtn = document.getElementById("btnAdd");
+        const updateBtn = document.getElementById("updateBtn");
+        const addUrl = document.getElementById("addUrl");
+
+        function addManga() {
+            sse("/api/add?uri=" + addUrl.value)
+        }
+
+        function updateManga() {
+            sse("/api/update")
+        }
+
+        function sse(uri) {
+            reset()
+            addBtn.disabled = true;
+            updateBtn.disabled = false;
+            addUrl.disabled = true;
+
+            const source = new EventSource(uri);
+
+            source.addEventListener("message", function (event) {
+                if (event.data === "EOF") {
+                    source.close()
+                    addBtn.disabled = false;
+                    updateBtn.disabled = false;
+                    addUrl.disabled = false;
+                    addUrl.value = ""
+                    return
+                }
+                add(event.data)
+            });
+        }
+
+        function reset() {
+            eventLog.innerHTML = ""
+        }
+
+        function add(content) {
+            const responseElement = document.createElement("p");
+            responseElement.textContent = content;
+
+            eventLog.appendChild(responseElement);
+            eventLog.scrollTop = eventLog.scrollHeight;
+        }
+    </script>
+</body>
+
+</html>
