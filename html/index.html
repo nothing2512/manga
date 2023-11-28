@@ -38,7 +38,7 @@
         function sse(uri) {
             reset()
             addBtn.disabled = true;
-            updateBtn.disabled = false;
+            updateBtn.disabled = true;
             addUrl.disabled = true;
 
             const source = new EventSource(uri);
