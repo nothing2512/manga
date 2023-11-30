@@ -25,6 +25,9 @@
         .icon-container:hover path {
             fill: #ffffff;
         }
+        .btn-outline-white:hover path {
+            fill: #212529;
+        }
     </style>
 
     <style>
@@ -74,7 +77,10 @@
             getTimer(d) {
                 let date = new Date(d)
                 let now = new Date()
-                let diff = Math.floor((now - date) / (1000 * 60 * 60));
+                let diff = Math.floor((now - date) / (1000 * 60));
+
+                if (diff < 60) return `${diff}m`
+                diff = Math.floor(diff/60)
                 
                 if (diff < 24) return `${diff}h`
                 diff = Math.floor(diff/24)
@@ -107,21 +113,21 @@
                             <div class="row justify-content-center px-2">
                                 <div class="col-12 col-lg-1">
                                     <div class="form-group">
-                                        <a href="/" class="btn btn-outline-primary icon-container">
+                                        <a href="/" class="btn btn-outline-white icon-container">
                                             <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                                                 <path
                                                     d="M21 19.9997C21 20.552 20.5523 20.9997 20 20.9997H4C3.44772 20.9997 3 20.552 3 19.9997V9.48882C3 9.18023 3.14247 8.88893 3.38606 8.69947L11.3861 2.47725C11.7472 2.19639 12.2528 2.19639 12.6139 2.47725L20.6139 8.69947C20.8575 8.88893 21 9.18023 21 9.48882V19.9997ZM19 18.9997V9.97791L12 4.53346L5 9.97791V18.9997H19Z"
-                                                    fill="#5e72e4"></path>
+                                                    fill="#ffffff"></path>
                                             </svg>
                                         </a>
                                     </div>
                                 </div>
-                                <div class="col-12 col-lg-7">
+                                <div class="col-12 col-lg-8">
                                     <div class="form-group">
                                         <input class="form-control" placeholder="Search" type="text" x-model="search">
                                     </div>
                                 </div>
-                                <div class="col-12 col-lg-4">
+                                <div class="col-12 col-lg-3">
                                     <div class="form-group">
                                         <select class="form-control" data-toggle="select" x-model="state">
                                             <option selected value="a">All</option>

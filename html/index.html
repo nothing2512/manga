@@ -50,7 +50,7 @@
                             </a>
                         </div>
                         <div class="col-12">
-                            <div class="bg-white" id="eventLog" style="height: 500px; overflow-y: scroll; border-radius: .5rem; padding: 8px;">
+                            <div class="bg-white" id="eventLog" style="height: 500px; overflow-y: scroll; border-radius: .5rem; padding: 1rem;">
                             </div>
                         </div>
                     </div>
@@ -102,7 +102,8 @@
 
         function add(content) {
             const responseElement = document.createElement("p");
-            responseElement.style.marginBottom = ".25rem"
+            responseElement.style.marginBottom = ".5rem"
+            responseElement.style.color = "#212529"
             responseElement.textContent = content;
 
             eventLog.appendChild(responseElement);
