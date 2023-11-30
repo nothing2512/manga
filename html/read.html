@@ -2,14 +2,21 @@
 
 <head>
     <title>Read Manga</title>
-    <link rel="icon" href="/favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href='/fonts/fonts.css'>
     <link rel="stylesheet" href='/vendor/nucleo/css/nucleo.css'>
     <link rel="stylesheet" href='/vendor/@fortawesome/fontawesome-free/css/all.min.css'>
     <link rel="stylesheet" href='/css/argon.css?v=1.1.0'>
-    <link rel="stylesheet" href='/vendor/select2/dist/css/select2.min.css'>
     <link rel="stylesheet" href='/css/bootstrap.min.css'>
     <link rel="stylesheet" href='/css/custom.css'>
+
+    <script>
+        const isDarkTheme = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const linkElement = document.createElement('link');
+        linkElement.setAttribute('rel', 'icon');
+        linkElement.setAttribute('type', 'image/x-icon')
+        linkElement.setAttribute('href', isDarkTheme ? '/favicon-light.png' : '/favicon-dark.png');
+        document.head.appendChild(linkElement);
+    </script>
 
     <script src="//unpkg.com/alpinejs"></script>
     <script>
@@ -17,15 +24,14 @@
             init() {
                 fetch(`/api/read${location.search}`).then(data => data.json()).then(data => {
                     this.data = data;
+                    document.title = data.manga.name;
                     document.addEventListener('keydown', function (e) {
                         if (e.keyCode == 37 && data.canPrevious) location.href = `/read?id=${data.manga.id}&page=${data.page - 1}`
                         if (e.keyCode == 39 && data.canNext) location.href = `/read?id=${data.manga.id}&page=${data.page + 1}`
                     });
 
                     if (data.canNext) {
-                        console.log("Can Next")
                         document.getElementById("nextBtn").addEventListener('click', function () {
-                            console.log("Can Next")
                             location.href = `/read?id=${data.manga.id}&page=${data.page + 1}`
                         })
                     } else {
@@ -48,16 +54,6 @@
                     this.loading = false;
                 })
             },
-            showModal() {
-                this.modalVisibility = "display: block;"
-                this.modalClass = "modal fade show"
-            },
-            hideModal() {
-                this.modalVisibility = ""
-                this.modalClass = "modal fade"
-            },
-            modalVisibility: "",
-            modalClass: "modal fade",
             w: 50,
             shown: true,
             loading: true,
@@ -77,25 +73,56 @@
 
 <body x-data="data">
 
+    <div id="header" class="row bg-secondary justify-content-center" x-bind:class="shown ? '' : 'd-none'">
+
+        <div class="col-2 col-md-12 col-sm-2 d-flex align-items-center justify-content-center">
+            <h4 class="text-white" x-html="data.page" style="font-weight: 400;"></h4>
+        </div>
+        <div class="col-2 col-md-12 col-sm-2 d-flex align-items-center justify-content-center">
+            <h4 class="text-white" style="font-weight: 400;">OF</h4>
+        </div>
+        <div class="col-md-12 col-sm-2 d-flex align-items-center justify-content-center">
+            <h4 class="text-white" style="font-weight: 400;" x-html="data.manga.index"></h4>
+        </div>
+
+    </div>
+
+    <div id="footer" class="row bg-secondary" x-bind:class="shown ? '' : 'd-none'">
+        <!-- Home -->
+        <a href="/" class="bt-hover col-2 col-md-12 col-sm-2 d-flex align-items-center justify-content-center">
+            <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 19.9997C21 20.552 20.5523 20.9997 20 20.9997H4C3.44772 20.9997 3 20.552 3 19.9997V9.48882C3 9.18023 3.14247 8.88893 3.38606 8.69947L11.3861 2.47725C11.7472 2.19639 12.2528 2.19639 12.6139 2.47725L20.6139 8.69947C20.8575 8.88893 21 9.18023 21 9.48882V19.9997ZM19 18.9997V9.97791L12 4.53346L5 9.97791V18.9997H19Z" fill="rgba(255,255,255,1)"></path></svg>
+        </a> <!-- Home -->
+        <!-- Home -->
+        <a href="/list" class="bt-hover col-2 col-md-12 col-sm-2 d-flex align-items-center justify-content-center">
+            <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M5 12.5C5 12.8134 5.46101 13.3584 6.53047 13.8931C7.91405 14.5849 9.87677 15 12 15C14.1232 15 16.0859 14.5849 17.4695 13.8931C18.539 13.3584 19 12.8134 19 12.5V10.3287C17.35 11.3482 14.8273 12 12 12C9.17273 12 6.64996 11.3482 5 10.3287V12.5ZM19 15.3287C17.35 16.3482 14.8273 17 12 17C9.17273 17 6.64996 16.3482 5 15.3287V17.5C5 17.8134 5.46101 18.3584 6.53047 18.8931C7.91405 19.5849 9.87677 20 12 20C14.1232 20 16.0859 19.5849 17.4695 18.8931C18.539 18.3584 19 17.8134 19 17.5V15.3287ZM3 17.5V7.5C3 5.01472 7.02944 3 12 3C16.9706 3 21 5.01472 21 7.5V17.5C21 19.9853 16.9706 22 12 22C7.02944 22 3 19.9853 3 17.5ZM12 10C14.1232 10 16.0859 9.58492 17.4695 8.89313C18.539 8.3584 19 7.81342 19 7.5C19 7.18658 18.539 6.6416 17.4695 6.10687C16.0859 5.41508 14.1232 5 12 5C9.87677 5 7.91405 5.41508 6.53047 6.10687C5.46101 6.6416 5 7.18658 5 7.5C5 7.81342 5.46101 8.3584 6.53047 8.89313C7.91405 9.58492 9.87677 10 12 10Z" fill="rgba(255,255,255,1)"></path></svg>
+            <!-- <img alt="#" src="/svg/database.svg" class="icon" /> -->
+        </a> <!-- Home -->
+        <!-- Delete -->
+        <a class="bt-hover col-2 col-md-12 col-sm-2 d-flex align-items-center justify-content-center" id="deleteBtn"
+            href="javascript:;">
+            <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 6H22V8H20V21C20 21.5523 19.5523 22 19 22H5C4.44772 22 4 21.5523 4 21V8H2V6H7V3C7 2.44772 7.44772 2 8 2H16C16.5523 2 17 2.44772 17 3V6ZM18 8H6V20H18V8ZM9 11H11V17H9V11ZM13 11H15V17H13V11ZM9 4V6H15V4H9Z" fill="rgba(255,255,255,1)"></path></svg>
+        </a> <!-- Delete -->
+        <!-- Prev -->
+        <a href="javascript:;" id="prevBtn" x-bind:style="data.canPrevious ? '' : 'display: none !important'"
+            class="bt-hover col-2 col-md-12 col-sm-2  d-flex align-items-center justify-content-center">
+            <svg class="icon r-180" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19.1643 12.0001L12.9572 5.79297L11.543 7.20718L16.3359 12.0001L11.543 16.793L12.9572 18.2072L19.1643 12.0001ZM13.5144 12.0001L7.30728 5.79297L5.89307 7.20718L10.686 12.0001L5.89307 16.793L7.30728 18.2072L13.5144 12.0001Z" fill="rgba(255,255,255,1)"></path></svg>
+        </a> <!-- Prev -->
+        <!-- Modal -->
+        <a href="javascript:;"
+            class="bt-hover col-2 col-md-12 col-sm-2 d-flex align-items-center justify-content-center"
+            x-on:click="$('#modal').modal('toggle')">
+            <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M8 4H21V6H8V4ZM4.5 6.5C3.67157 6.5 3 5.82843 3 5C3 4.17157 3.67157 3.5 4.5 3.5C5.32843 3.5 6 4.17157 6 5C6 5.82843 5.32843 6.5 4.5 6.5ZM4.5 13.5C3.67157 13.5 3 12.8284 3 12C3 11.1716 3.67157 10.5 4.5 10.5C5.32843 10.5 6 11.1716 6 12C6 12.8284 5.32843 13.5 4.5 13.5ZM4.5 20.4C3.67157 20.4 3 19.7284 3 18.9C3 18.0716 3.67157 17.4 4.5 17.4C5.32843 17.4 6 18.0716 6 18.9C6 19.7284 5.32843 20.4 4.5 20.4ZM8 11H21V13H8V11ZM8 18H21V20H8V18Z" fill="rgba(255,255,255,1)"></path></svg>
+        </a> <!-- Modal -->
+        <!-- Next -->
+        <a href="javascript:;" id="nextBtn" x-bind:style="data.canNext ? '' : 'display: none !important'"
+            class="bt-hover col-2 col-md-12 col-sm-2  d-flex align-items-center justify-content-center">
+            <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19.1643 12.0001L12.9572 5.79297L11.543 7.20718L16.3359 12.0001L11.543 16.793L12.9572 18.2072L19.1643 12.0001ZM13.5144 12.0001L7.30728 5.79297L5.89307 7.20718L10.686 12.0001L5.89307 16.793L7.30728 18.2072L13.5144 12.0001Z" fill="rgba(255,255,255,1)"></path></svg>
+        </a> <!-- Next -->
+    </div>
+
     <div class="bg-dark" x-on:click="shown = !shown">
         <div class="bg-dark h-100vh w-100" style="position: fixed"></div>
         <div class="container-fluid no-space hvh d-flex flex-column">
-            <template x-if="shown">
-                <div id="header" class="row bg-secondary">
-
-                    <div class="col-4 col-md-12 col-sm-4 d-flex align-items-center justify-content-center">
-                        <h4 class="text-white" x-html="data.page"></h4>
-                    </div>
-                    <div class="col-4 col-md-12 col-sm-4 d-flex align-items-center justify-content-center">
-                        <h4 class="text-white">OF</h4>
-                    </div>
-                    <div class="col-4 col-md-12 col-sm-4 d-flex align-items-center justify-content-center">
-                        <h4 class="text-white" x-html="data.manga.index"></h4>
-                    </div>
-
-                </div>
-            </template>
-
             <div id="content" class="content flex-fill row justify-content-center">
 
                 <template x-for="img in data.images">
@@ -106,73 +133,43 @@
                 </template>
 
             </div>
-
-            <template x-if="shown">
-                <div id="footer" class="row bg-secondary">
-                    <!-- Home -->
-                    <a href="/list"
-                        class="bt-hover col-4 col-md-12 col-sm-4 d-flex align-items-center justify-content-center">
-                        <img alt="#" src="/svg/home.svg" class="icon" />
-                    </a> <!-- Home -->
-                    <!-- Archive -->
-                    <a class="bt-hover col-4 col-md-12 col-sm-4 d-flex align-items-center justify-content-center">
-                        <img alt="#" src="/svg/archieve.svg" class="icon" />
-                    </a> <!-- Archive -->
-                    <!-- Delete -->
-                    <a class="bt-hover col-4 col-md-12 col-sm-4 d-flex align-items-center justify-content-center"
-                        id="deleteBtn" href="javascript:;">
-                        <img alt="#" src="/svg/delete.svg" class="icon" />
-                    </a> <!-- Delete -->
-                    <!-- Prev -->
-                    <a href="javascript:;" id="prevBtn" x-bind:style="data.canPrevious ? '' : 'display: none !important'"
-                        class="bt-hover col-4 col-md-12 col-sm-4  d-flex align-items-center justify-content-center">
-                        <img alt="#" src="/svg/next.svg" class="icon r-180" />
-                    </a> <!-- Prev -->
-                    <!-- Modal -->
-                    <a href="javascript:;"
-                        class="bt-hover col-4 col-md-12 col-sm-4 d-flex align-items-center justify-content-center"
-                        x-on:click="showModal">
-                        <img alt="#" src="/svg/list.svg" class="icon" />
-                    </a> <!-- Modal -->
-                    <!-- Next -->
-                    <a href="javascript:;" id="nextBtn" x-bind:style="data.canNext ? '' : 'display: none !important'"
-                        class="bt-hover col-4 col-md-12 col-sm-4  d-flex align-items-center justify-content-center">
-                        <img alt="#" src="/svg/next.svg" class="icon" />
-                    </a> <!-- Next -->
-                </div>
-            </template>
         </div>
+    </div>
 
-        <div x-bind:style="modalVisibility" id="modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-            aria-hidden="true" x-bind:class="modalClass">
+    <div id="modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+            aria-hidden="true" >
             <div class="modal-dialog" role="document">
                 <div class="modal-content bg-secondary">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel">Page</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"
-                            x-on:click="hideModal">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
                     <div class="modal-body bg-secondary">
-                        <div>
-                            <a class="dropdown-item text-light" href="/list">Home</a>
-                            <div class="dropdown-divider"></div>
-                        </div>
-                        <template x-for="page in data.manga.index">
-                            <div>
-                                <a x-bind:href="`/read?id=${data.manga.id}&page=${page}&w=${w}`"
-                                    class="dropdown-item text-light" x-html="`Page ${page}`"></a>
-                                <div class="dropdown-divider"></div>
+                        <div class="row">
+                            <div class="col-6 pb-3">
+                                <a href="/" class="btn btn-outline-light w-100 bt-hover">
+                                    <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 19.9997C21 20.552 20.5523 20.9997 20 20.9997H4C3.44772 20.9997 3 20.552 3 19.9997V9.48882C3 9.18023 3.14247 8.88893 3.38606 8.69947L11.3861 2.47725C11.7472 2.19639 12.2528 2.19639 12.6139 2.47725L20.6139 8.69947C20.8575 8.88893 21 9.18023 21 9.48882V19.9997ZM19 18.9997V9.97791L12 4.53346L5 9.97791V18.9997H19Z" fill="rgba(255,255,255,1)"></path></svg>
+                                </a>
                             </div>
-                        </template>
+                            <div class="col-6 pb-3">
+                                <a href="/list" class="btn btn-outline-light w-100 bt-hover">
+                                    <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M5 12.5C5 12.8134 5.46101 13.3584 6.53047 13.8931C7.91405 14.5849 9.87677 15 12 15C14.1232 15 16.0859 14.5849 17.4695 13.8931C18.539 13.3584 19 12.8134 19 12.5V10.3287C17.35 11.3482 14.8273 12 12 12C9.17273 12 6.64996 11.3482 5 10.3287V12.5ZM19 15.3287C17.35 16.3482 14.8273 17 12 17C9.17273 17 6.64996 16.3482 5 15.3287V17.5C5 17.8134 5.46101 18.3584 6.53047 18.8931C7.91405 19.5849 9.87677 20 12 20C14.1232 20 16.0859 19.5849 17.4695 18.8931C18.539 18.3584 19 17.8134 19 17.5V15.3287ZM3 17.5V7.5C3 5.01472 7.02944 3 12 3C16.9706 3 21 5.01472 21 7.5V17.5C21 19.9853 16.9706 22 12 22C7.02944 22 3 19.9853 3 17.5ZM12 10C14.1232 10 16.0859 9.58492 17.4695 8.89313C18.539 8.3584 19 7.81342 19 7.5C19 7.18658 18.539 6.6416 17.4695 6.10687C16.0859 5.41508 14.1232 5 12 5C9.87677 5 7.91405 5.41508 6.53047 6.10687C5.46101 6.6416 5 7.18658 5 7.5C5 7.81342 5.46101 8.3584 6.53047 8.89313C7.91405 9.58492 9.87677 10 12 10Z" fill="rgba(255,255,255,1)"></path></svg>
+                                </a>
+                            </div>
+                            <template x-for="page in data.manga.index">
+                                <div class="col-3 pb-3">
+                                    <a 
+                                        x-bind:href="`/read?id=${data.manga.id}&page=${page}&w=${w}`" 
+                                        class="btn w-100" 
+                                        x-html="page"
+                                        x-bind:class="page == data.manga.lastRead ? 'btn-light' : 'btn-outline-light'"></a>
+                                </div>
+                            </template>
+                        </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" x-on:click="hideModal">Close</button>
+                        <button type="button" class="btn btn-secondary" x-on:click="$('#modal').modal('toggle')">Close</button>
                     </div>
                 </div>
             </div>
         </div>
+
         <template x-if="loading">
             <div class="d-flex justify-content-center align-items-center vh-100 w-100 bg-dark"
                 style="position: fixed; top: 0">
@@ -181,10 +178,11 @@
 
             </div>
         </template>
-    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
         crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
 </body>
 
 </html>

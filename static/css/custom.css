@@ -32,7 +32,11 @@ a:hover {
 }
 
 .bt-hover:hover {
-    background-color: #9e2fff;
+    background-color: var(--light);
+}
+
+.bt-hover:hover path {
+    fill: #6c757d !important;
 }
 
 .hidden {
@@ -59,12 +63,16 @@ a:hover {
     position: fixed;
     bottom: 0;
     width: 100%;
+    overflow: hidden;
+    z-index: 100;
 }
 
 #header {
     position: fixed;
     top: 0;
     width: 100%;
+    overflow: hidden;
+    z-index: 100;
 }
 
 #header div {
@@ -78,9 +86,8 @@ a:hover {
         bottom: unset;
         z-index: 10;
         top: 20vh;
-        right: 0;
-        border-top-left-radius: .25rem;
-        border-bottom-left-radius: .25rem;
+        right: 48px;
+        border-radius: .25rem;
     }
 
     #header {
@@ -89,9 +96,8 @@ a:hover {
         bottom: unset;
         z-index: 10;
         top: 30vh;
-        left: 0;
-        border-top-right-radius: .25rem;
-        border-bottom-right-radius: .25rem;
+        left: 48px;
+        border-radius: .25rem;
     }
 
     #footer a, #header a {
@@ -100,10 +106,6 @@ a:hover {
 
     #footer .bt-hover, #header .bt-hover {
         height: 16.66%;
-    }
-
-    .bt-hover:hover {
-        background-color: #9e2fff;
     }
 
     .right-divider {

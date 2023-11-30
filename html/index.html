@@ -2,20 +2,60 @@
 
 <head>
     <title>Manga Ku</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link rel="stylesheet" href='/fonts/fonts.css'>
+    <link rel="stylesheet" href='/vendor/nucleo/css/nucleo.css'>
+    <link rel="stylesheet" href='/vendor/@fortawesome/fontawesome-free/css/all.min.css'>
+    <link rel="stylesheet" href='/css/argon.css?v=1.1.0'>
+
+    <script>
+        const isDarkTheme = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const linkElement = document.createElement('link');
+        linkElement.setAttribute('rel', 'icon');
+        linkElement.setAttribute('type', 'image/x-icon')
+        linkElement.setAttribute('href', isDarkTheme ? '/favicon-light.png' : '/favicon-dark.png');
+        document.head.appendChild(linkElement);
+    </script>
+
+    <style>
+        .btn-outline-white:hover path {
+            fill: #212529;
+        }
+    </style>
 </head>
 
 <body class="bg-dark">
-    <div class="row justify-content-center p-3">
-        <a href="/list" class="btn btn-light col-6 m-3 p-3">Lihat</a>
-        <button id="updateBtn" class="btn btn-light col-6 m-3 p-3" onclick="updateManga()">Update</button>
-        <div class="col-6 m-3 p-0">
-            <input type="text" name="uri" class="form-control my-2" placeholder="url" id="addUrl">
-            <button class="btn btn-light col-12" id="btnAdd" onclick="addManga()">Add</a>
-        </div>
-        <div id="eventLog"
-            style="height: 300px; overflow-y: scroll; background: #111111; color: #fefefe; padding: 8px; margin: 8px;">
+    <div class="g-sidenav-show g-sidenav-pinned">
+        <div class="main-content">
+            <section class="section section-lg pt-5">
+                <div class="container">
+                    <div class="row justify-content-center">
+                        <div class="col-9">
+                            <div class="form-group">
+                                <input class="form-control" type="url" placeholder="url" id="addUrl">
+                            </div>
+                        </div>
+                        <div class="col-1">
+                            <button class="btn btn-outline-white w-100" id="btnAdd" onclick="addManga()">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M11 11V5H13V11H19V13H13V19H11V13H5V11H11Z" fill="rgba(255,255,255,1)"></path></svg>
+                            </button>
+                        </div>
+                        <div class="col-1">
+                            <button class="btn btn-outline-white w-100" id="updateBtn" onclick="updateManga()">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M5.46257 4.43262C7.21556 2.91688 9.5007 2 12 2C17.5228 2 22 6.47715 22 12C22 14.1361 21.3302 16.1158 20.1892 17.7406L17 12H20C20 7.58172 16.4183 4 12 4C9.84982 4 7.89777 4.84827 6.46023 6.22842L5.46257 4.43262ZM18.5374 19.5674C16.7844 21.0831 14.4993 22 12 22C6.47715 22 2 17.5228 2 12C2 9.86386 2.66979 7.88416 3.8108 6.25944L7 12H4C4 16.4183 7.58172 20 12 20C14.1502 20 16.1022 19.1517 17.5398 17.7716L18.5374 19.5674Z" fill="rgba(255,255,255,1)"></path></svg>
+                            </button>
+                        </div>
+                        <div class="col-1">
+                            <a class="btn btn-outline-white w-100" href="/list">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M5 12.5C5 12.8134 5.46101 13.3584 6.53047 13.8931C7.91405 14.5849 9.87677 15 12 15C14.1232 15 16.0859 14.5849 17.4695 13.8931C18.539 13.3584 19 12.8134 19 12.5V10.3287C17.35 11.3482 14.8273 12 12 12C9.17273 12 6.64996 11.3482 5 10.3287V12.5ZM19 15.3287C17.35 16.3482 14.8273 17 12 17C9.17273 17 6.64996 16.3482 5 15.3287V17.5C5 17.8134 5.46101 18.3584 6.53047 18.8931C7.91405 19.5849 9.87677 20 12 20C14.1232 20 16.0859 19.5849 17.4695 18.8931C18.539 18.3584 19 17.8134 19 17.5V15.3287ZM3 17.5V7.5C3 5.01472 7.02944 3 12 3C16.9706 3 21 5.01472 21 7.5V17.5C21 19.9853 16.9706 22 12 22C7.02944 22 3 19.9853 3 17.5ZM12 10C14.1232 10 16.0859 9.58492 17.4695 8.89313C18.539 8.3584 19 7.81342 19 7.5C19 7.18658 18.539 6.6416 17.4695 6.10687C16.0859 5.41508 14.1232 5 12 5C9.87677 5 7.91405 5.41508 6.53047 6.10687C5.46101 6.6416 5 7.18658 5 7.5C5 7.81342 5.46101 8.3584 6.53047 8.89313C7.91405 9.58492 9.87677 10 12 10Z" fill="rgba(255,255,255,1)"></path></svg>
+                            </a>
+                        </div>
+                        <div class="col-12">
+                            <div class="bg-white" id="eventLog" style="height: 500px; overflow-y: scroll; border-radius: .5rem; padding: 8px;">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
         </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
@@ -62,6 +102,7 @@
 
         function add(content) {
             const responseElement = document.createElement("p");
+            responseElement.style.marginBottom = ".25rem"
             responseElement.textContent = content;
 
             eventLog.appendChild(responseElement);
