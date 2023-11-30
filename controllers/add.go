@@ -41,13 +41,16 @@ func (idb *InDb) Add(w http.ResponseWriter, r *http.Request) {
 
 	idb.write(w, "Getting Name")
 	manga.Name = strings.ReplaceAll(strings.Split(strings.Split(strings.Split(data, "<h1 class=\"entry-title\"")[1], ">")[1], "<")[0], "\n", "")
+	if manga.Name[:5] == "Komik" {
+		manga.Name = manga.Name[5:]
+	}
 	idb.write(w, "name : "+manga.Name)
 
 	idb.write(w, "Saving Manga")
 	idb.pg.Create(&manga)
 	idb.write(w, "Manga Saved")
 
-	err = idb.updateChapter(w, data, manga, "[1/1]")
+	err, _ = idb.updateChapter(w, data, manga, "[1/1]")
 	if err != nil {
 		idb.write(w, err.Error())
 		idb.write(w, "EOF")

@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"errors"
 	"fmt"
 	"main/models"
 	"net/http"
@@ -21,6 +22,8 @@ func (idb *InDb) Update(w http.ResponseWriter, r *http.Request) {
 
 	idb.write(w, "Updating Mangas")
 	total := len(mangas)
+	totalUpdated := 0
+	var errs []error
 	for k, m := range mangas {
 		data, err := idb.scrap(m.Link)
 		if err != nil {
@@ -28,14 +31,24 @@ func (idb *InDb) Update(w http.ResponseWriter, r *http.Request) {
 			idb.write(w, "EOF")
 			return
 		}
-		idb.updateChapter(w, data, m, fmt.Sprintf("[%v/%v]", k+1, total))
+		err, updated := idb.updateChapter(w, data, m, fmt.Sprintf("[%v/%v]", k+1, total))
+		totalUpdated += updated
+		if err != nil {
+			errs = append(errs, err)
+		}
 	}
+	idb.write(w, "")
+	idb.write(w, "Error : ")
+	for _, e := range errs {
+		idb.write(w, e.Error())
+	}
+	idb.write(w, fmt.Sprintf("Updated : %v", totalUpdated))
 	idb.write(w, "Done")
 	idb.write(w, "EOF")
 	return
 }
 
-func (idb *InDb) updateChapter(w http.ResponseWriter, data string, manga models.Manga, counter string) error {
+func (idb *InDb) updateChapter(w http.ResponseWriter, data string, manga models.Manga, counter string) (error, int) {
 	idb.write(w, counter+" Updating "+manga.Name)
 	// Getting list chapters
 	data = strings.Split(strings.Split(data, "id=\"chapter_list\"")[1], "</div>")[0]
@@ -43,10 +56,11 @@ func (idb *InDb) updateChapter(w http.ResponseWriter, data string, manga models.
 	slices.Reverse(chapters)
 
 	if len(chapters) <= manga.Index {
-		return nil
+		return nil, 0
 	}
 
 	total := len(chapters) - manga.Index
+	updated := 0
 
 	for k, ch := range chapters[manga.Index:] {
 		idb.write(w, fmt.Sprintf("%v Updating %v [%v/%v]", counter, manga.Name, k+1, total))
@@ -56,12 +70,12 @@ func (idb *InDb) updateChapter(w http.ResponseWriter, data string, manga models.
 		}
 		chData, err := idb.scrap(chapter.Link)
 		if err != nil {
-			return err
+			return errors.New(manga.Name), 0
 		}
 		imagesData := strings.Split(strings.Split(strings.Split(chData, "<div id=\"chimg-auh\">")[1], "</div>")[0], "<img src=\"")[1:]
 		var images []models.Image
 		if len(imagesData) == 0 {
-			return nil
+			return errors.New(manga.Name), 0
 		}
 		idb.pg.Create(&chapter)
 		for _, im := range imagesData {
@@ -72,8 +86,9 @@ func (idb *InDb) updateChapter(w http.ResponseWriter, data string, manga models.
 		}
 		idb.pg.Create(&images)
 		manga.Index += 1
+		updated += 1
 		manga.LastUpdated = time.Now()
 		idb.pg.Save(&manga)
 	}
-	return nil
+	return nil, updated
 }

@@ -1,0 +1,118 @@
+.row {
+    margin: 0;
+    padding: 0;
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+}
+
+.no-space {
+    margin: 0;
+    padding: 0;
+}
+
+.hvh {
+    height: 100vh;
+}
+
+a:hover {
+    color: unset;
+    text-decoration: unset;
+}
+
+.right-divider {
+    border-right: 1px dashed #FFFFFF;
+}
+
+.bt-hover {
+    padding: 10px;
+}
+
+.bt-hover:hover {
+    background-color: #9e2fff;
+}
+
+.hidden {
+    display: none;
+}
+
+.icon {
+    width: 32px;
+    height: 32px;
+}
+
+.disabled {
+    color: currentColor;
+    cursor: not-allowed;
+    pointer-events: none;
+    text-decoration: none;
+}
+
+.r-180 {
+    transform: rotate(180deg);
+}
+
+#footer {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+}
+
+#header {
+    position: fixed;
+    top: 0;
+    width: 100%;
+}
+
+#header div {
+    padding: 10px
+}
+
+@media (min-width: 768px) {
+    #footer {
+        height: 60%;
+        width: 5%;
+        bottom: unset;
+        z-index: 10;
+        top: 20vh;
+        right: 0;
+        border-top-left-radius: .25rem;
+        border-bottom-left-radius: .25rem;
+    }
+
+    #header {
+        height: 40%;
+        width: 5%;
+        bottom: unset;
+        z-index: 10;
+        top: 30vh;
+        left: 0;
+        border-top-right-radius: .25rem;
+        border-bottom-right-radius: .25rem;
+    }
+
+    #footer a, #header a {
+        cursor: pointer;
+    }
+
+    #footer .bt-hover, #header .bt-hover {
+        height: 16.66%;
+    }
+
+    .bt-hover:hover {
+        background-color: #9e2fff;
+    }
+
+    .right-divider {
+        border-right: unset;
+    }
+}
+
+.modal-body {
+    max-height: 75vh;
+    overflow: scroll;
+    overflow-x: hidden;
+}

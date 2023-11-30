@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"time"
 )
 
 func main() {
@@ -24,6 +25,10 @@ func main() {
 	}
 
 	http.HandleFunc("/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Cache-Control", "no-cache, private, max-age=0")
+		expires := time.Unix(0, 0)
+		w.Header().Set("Expires", expires.Format(http.TimeFormat))
+		w.Header().Set("Pragma", "no-cache")
 		if handler, ok := backends[r.URL.Path]; ok {
 			handler.ServeHTTP(w, r)
 			return
