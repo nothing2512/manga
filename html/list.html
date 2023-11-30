@@ -54,7 +54,12 @@
     <script>
         Alpine.data('data', () => ({
             init() {
-                fetch("/api/list").then(data => data.json()).then(data => this.mangas = data)
+                fetch("/api/list").then(data => data.json()).then(data => {
+                    for (let i in data) {
+                        data[i].lastUpdated = this.getTimer(data[i].lastUpdated)
+                    }
+                    this.mangas = data
+                })
             },
             shown(manga) {
                 let sameName = manga.name.toLowerCase().includes(this.search.toLowerCase())
@@ -66,6 +71,25 @@
 
                 return sameName && onState;
             },
+            getTimer(d) {
+                let date = new Date(d)
+                let now = new Date()
+                let diff = Math.floor((now - date) / (1000 * 60 * 60));
+                
+                if (diff < 24) return `${diff}h`
+                diff = Math.floor(diff/24)
+
+                if (diff < 7) return `${diff}d`
+                diff = Math.floor(diff/7)
+
+                if (diff < 4) return `${diff}w`
+                diff = Math.floor(diff/4)
+
+                if (diff < 12) return `${diff}m`
+                diff = Math.floor(diff/12)
+
+                return `${diff}y`
+            },
             mangas: [],
             search: "",
             state: "a"
@@ -74,7 +98,7 @@
 </head>
 
 <body x-data="data">
-    <div class="g-sidenav-show g-sidenav-pinned">
+    <div class="g-sidenav-show g-sidenav-pinned bg-dark">
         <div class="main-content">
             <section class="section section-lg pt-5">
                 <div class="container">
@@ -118,11 +142,13 @@
                                                     style="width: 100%; height: 325px; object-fit: cover; border-radius: .375rem;"
                                                     referrerpolicy="no-referrer">
                                                 <div class="pt-3">
-                                                    <h3 class="mb-0 text-primary text-uppercase"
+                                                    <h3 class="mb-0 text-secondary text-uppercase"
                                                         style="display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden;"
                                                         x-text="manga.name"></h3>
-                                                    <span style="color: #8ca1cb; font-weight: 500; font-size: 10pt; "
-                                                        x-text="`Progress ${manga.lastRead} / ${manga.index}`"></span>
+                                                    <div style="display: flex; justify-content: space-between;">
+                                                        <span style="color: #8ca1cb; font-weight: 500; font-size: 10pt;" x-text="`Progress ${manga.lastRead} / ${manga.index}`"></span>
+                                                        <span style="color: #8ca1cb; font-weight: 500; font-size: 10pt;" x-text="`${manga.lastUpdated} ago`"></span>
+                                                    </div>
                                                 </div>
                                             </a>
                                         </div>
