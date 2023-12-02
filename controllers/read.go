@@ -12,6 +12,9 @@ func (idb *InDb) Read(w http.ResponseWriter, r *http.Request) {
 	idb.pg.First(&manga, "id = ?", r.URL.Query().Get("id"))
 
 	page, _ := strconv.Atoi(r.URL.Query().Get("page"))
+	if page == 0 {
+		page = manga.LastRead
+	}
 	var chapter models.Chapter
 	idb.pg.
 		Order("id").

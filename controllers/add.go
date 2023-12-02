@@ -50,7 +50,7 @@ func (idb *InDb) Add(w http.ResponseWriter, r *http.Request) {
 	idb.pg.Create(&manga)
 	idb.write(w, "Manga Saved")
 
-	err, _ = idb.updateChapter(w, data, manga, "[1/1]")
+	err, _ = idb.updateChapter(w, data, manga, "[1/1]", false)
 	if err != nil {
 		idb.write(w, err.Error())
 		idb.write(w, "EOF")

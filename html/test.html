@@ -1,0 +1,23 @@
+<html>
+    <head>
+        <script src="//unpkg.com/alpinejs"></script>
+        <script>
+            Alpine.data("data", () =>({
+                data: "name"
+            }))
+            function update(data) {
+                console.log(data)
+                data = "Robet"
+            }
+        </script>
+    </head>
+    <body x-data="data">
+        <h1 x-html="data"></h1>
+        <button x-on:click="update(data)">x</button>
+        <script>
+            function update(data) {
+                data = "Robet"
+            }
+        </script>
+    </body>
+</html>

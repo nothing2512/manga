@@ -31,7 +31,7 @@ func (idb *InDb) Update(w http.ResponseWriter, r *http.Request) {
 			idb.write(w, "EOF")
 			return
 		}
-		err, updated := idb.updateChapter(w, data, m, fmt.Sprintf("[%v/%v]", k+1, total))
+		err, updated := idb.updateChapter(w, data, m, fmt.Sprintf("[%v/%v]", k+1, total), false)
 		totalUpdated += updated
 		if err != nil {
 			errs = append(errs, err)
@@ -48,10 +48,21 @@ func (idb *InDb) Update(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
-func (idb *InDb) updateChapter(w http.ResponseWriter, data string, manga models.Manga, counter string) (error, int) {
+func (idb *InDb) updateChapter(w http.ResponseWriter, data string, manga models.Manga, counter string, cached bool) (error, int) {
 	idb.write(w, counter+" Updating "+manga.Name)
 	// Getting list chapters
-	data = strings.Split(strings.Split(data, "id=\"chapter_list\"")[1], "</div>")[0]
+	_data := strings.Split(data, "id=\"chapter_list\"")
+	if len(_data) <= 1 {
+		if cached {
+			return errors.New(manga.Name), 0
+		}
+		d, err := idb.scrap(fmt.Sprintf("https://webcache.googleusercontent.com/search?q=cache:%v", manga.Link))
+		if err != nil {
+			return errors.New(manga.Name), 0
+		}
+		return idb.updateChapter(w, d, manga, counter, true)
+	}
+	data = strings.Split(_data[1], "</div>")[0]
 	chapters := strings.Split(data, "<span class=\"lchx\">")[1:]
 	slices.Reverse(chapters)
 
@@ -70,6 +81,15 @@ func (idb *InDb) updateChapter(w http.ResponseWriter, data string, manga models.
 		}
 		chData, err := idb.scrap(chapter.Link)
 		if err != nil {
+			return errors.New(manga.Name), 0
+		}
+		if strings.Contains(chData, "Just a moment...") {
+			chData, err = idb.scrap(fmt.Sprintf("https://webcache.googleusercontent.com/search?q=cache:%v", chapter.Link))
+			if err != nil {
+				return errors.New(manga.Name), 0
+			}
+		}
+		if strings.Contains(chData, "Just a moment...") {
 			return errors.New(manga.Name), 0
 		}
 		imagesData := strings.Split(strings.Split(strings.Split(chData, "<div id=\"chimg-auh\">")[1], "</div>")[0], "<img src=\"")[1:]
